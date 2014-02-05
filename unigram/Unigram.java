@@ -145,7 +145,7 @@ public class Unigram extends CountWords{
 		
 		double beta=bigramModel.optimizeBeta(args[2]);
 		System.out.println("(5) beta = "+beta+"\t prob = "+bigramModel.getBigramLogModelProb(args[1], beta));
-		
+		System.out.println("(6) "+bigramModel.guessGoodBadCorrectRateBigram(args[3], beta));
 	}
 	
 	

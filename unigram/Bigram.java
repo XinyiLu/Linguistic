@@ -156,4 +156,41 @@ public class Bigram extends CountWords{
 		return bigramGoldenSectionSearch(heldOutMap,a,b,c,0.0001/totalCount,getBigramTypeCount(heldOutMap));
 	}
 	
+	public boolean guessGoodBadBigram(String[] pair,double beta){
+		assert(pair.length==2);
+		double[] probs=new double[2];
+		for(int i=0;i<pair.length;i++){
+			String line=pair[i];			
+			HashMap<String,HashMap<String,Integer>> lineMap=new HashMap<String,HashMap<String,Integer>>();
+			parseBigramPairToHashMap(lineMap,line);
+			probs[i]=getBigramLogModelProbHelper(lineMap,beta);
+		}
+		
+		return probs[0]>probs[1];
+	}
+	
+	public double guessGoodBadCorrectRateBigram(String testFile,double beta){
+		BufferedReader reader;
+		double rate=0.0;
+		
+		try {
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(testFile),"ISO-8859-1"));
+			String[] pair=new String[2];
+			int pairCount=0,rightCount=0;
+			while((pair[0]=reader.readLine())!=null){
+				pair[1]=reader.readLine();
+				pairCount++;
+				if(guessGoodBadBigram(pair,beta)){
+					rightCount++;
+				}
+			}
+			reader.close();
+			rate=rightCount*1.0/pairCount;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return rate;
+	} 
+
 }
