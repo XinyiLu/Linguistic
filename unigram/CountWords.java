@@ -7,7 +7,10 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+
 
 public class CountWords {
 	protected HashMap<String,Integer> map;
@@ -18,28 +21,37 @@ public class CountWords {
 		return map;
 	}
 	
+	public int getTotalCount(){
+		return totalCount;
+	}
+	
+
 	protected CountWords(){
 		map=new HashMap<String,Integer>();
 		resphi=2-(1+Math.sqrt(5))/2.0;
+		totalCount=0;
 	}
 
 	//function to count words in a line
-	protected void countWords(String line){
+	protected void countWords(HashMap<String,Integer> hashMap,String line){
 		//split words with whitespace
 		String[] words=line.split(" ");
+		ArrayList<String> list=new ArrayList<String> (Arrays.asList(words));
+		list.add("");
 		//count the number of each word
-		for(String word:words){
+		for(String word:list){
 			//if the word is "",ignore it
 			if(word.isEmpty())
 				continue;
-			totalCount++;
+			//totalCount++;
 			//if the word hasn't been counted, add it to the map
-			if(!map.containsKey(word)){
-				map.put(word,0);
+			if(!hashMap.containsKey(word)){
+				hashMap.put(word,0);
 			}
 			//add the count of this word by one
-			map.put(word,map.get(word)+1);
+			hashMap.put(word,hashMap.get(word)+1);
 		}
+		
 	}
 	
 	//function to read input file and save the counts to the map
@@ -49,10 +61,16 @@ public class CountWords {
 			String line=null;
 			//each time we read a line, count its words
 			while((line=reader.readLine())!=null){
-				countWords(line);
+				countWords(map,line);
 			}
 			//close the buffered reader
 			reader.close();
+			//calculate totalCount
+			for(String word:map.keySet()){
+				totalCount+=map.get(word);
+			}
+			
+			
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -64,6 +82,9 @@ public class CountWords {
 			BufferedWriter writer=new BufferedWriter(new FileWriter(fileName));
 			//for each word in keySet of the map, save the key and value and write a new line
 			for(String word:map.keySet()){
+				if(word.isEmpty()){
+					continue;
+				}
 				writer.write(word+" "+map.get(word).toString());
 				writer.newLine();
 			}
