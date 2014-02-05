@@ -7,19 +7,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Bigram{
-	
-//	class BigramPair{
-//		String word1;
-//		String word2;
-//		
-//		public BigramPair(String first,String second){
-//			word1=first;
-//			word2=second;
-//		}
-//	}
-	
-	
+public class Bigram extends CountWords{
+
 	private Unigram unigram;
 	private double alpha;
 	private HashMap<String,HashMap<String,Integer>> bigramMap;
@@ -82,7 +71,6 @@ public class Bigram{
 		}
 	}
 	
-	
 	public double getBigramWordSmoothedProb(String word1,String word2,double beta,int typeCount){
 		double theta=unigram.getUnigramWordSmoothedProb(word2, alpha,typeCount);
 		if(!unigram.getHashMap().containsKey(word1)){
@@ -123,6 +111,49 @@ public class Bigram{
 		Bigram bigramModel=new Bigram();
 		bigramModel.readTrainingFileToBigram(fileName);
 		return getBigramLogModelProbHelper(bigramModel.getBigramMap(),beta);
+	}
+
+	public double getBigramHeldOutWordLogProb(HashMap<String,HashMap<String,Integer>> heldOutMap,double beta){
+		return getBigramLogModelProbHelper(heldOutMap,beta);
+	}
+	public double bigramGoldenSectionSearch(HashMap<String,HashMap<String,Integer>> heldOutBigramMap,double a,double b,double c,double tau,int typeCount){
+		assert(c>b&&b>a);
+		double d=0;
+		
+		if(c-b>b-a){
+			d=b+resphi*(c-b);
+		}else{
+			d=b-resphi*(b-a);
+		}
+		if(Math.abs(c-a)<tau*(Math.abs(b)+Math.abs(d))){
+			return (c+a)/2.0;
+		}
+		double prob=getBigramHeldOutWordLogProb(heldOutBigramMap,d);
+		double prevProb=getBigramHeldOutWordLogProb(heldOutBigramMap,b);
+		assert(prob!=prevProb);
+		if(prob>prevProb){
+			if(c-b>b-a)
+				return bigramGoldenSectionSearch(heldOutBigramMap,b,d,c,tau,typeCount);
+			else
+				return bigramGoldenSectionSearch(heldOutBigramMap,a,d,b,tau,typeCount);
+		}else{
+			if(c-b>b-a)
+				return bigramGoldenSectionSearch(heldOutBigramMap,a,b,d,tau,typeCount);
+			else
+				return bigramGoldenSectionSearch(heldOutBigramMap,d,b,c,tau,typeCount);
+			
+		}
+		
+	} 
+
+	public double optimizeBeta(String heldOutFile){
+		Bigram heldOutBigram=new Bigram();
+		heldOutBigram.readTrainingFileToBigram(heldOutFile);
+		HashMap<String,HashMap<String,Integer>> heldOutMap=heldOutBigram.getBigramMap();
+		
+		double a=0,c=heldOutMap.size();
+		double b=a+resphi*(c-a);
+		return bigramGoldenSectionSearch(heldOutMap,a,b,c,0.0001/totalCount,getBigramTypeCount(heldOutMap));
 	}
 	
 }
