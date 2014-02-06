@@ -29,6 +29,7 @@ public abstract class BaseWordCounter {
 	}
 	
 	protected void trainModel(String fileName){
+		map.clear();
 		parseFileToMap(fileName,map);
 		//set totalWordCount
 		setTotalCount();
@@ -55,6 +56,7 @@ public abstract class BaseWordCounter {
 			e.printStackTrace();
 		}
 	}
+
 	
 	abstract int getTypeCount(HashMap hashMap);
 	

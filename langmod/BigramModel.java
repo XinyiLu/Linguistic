@@ -5,14 +5,14 @@ import java.util.HashMap;
 
 
 public class BigramModel extends BaseWordCounter {
-	private UnigramModel unigram;
+	private PaddedUnigramModel unigram;
 	private double alpha;
 	
 	public BigramModel(){
 		super();
 	}
 	
-	public BigramModel(UnigramModel uni,double al){
+	public BigramModel(PaddedUnigramModel uni,double al){
 		super();
 		unigram=uni;
 		alpha=al;
