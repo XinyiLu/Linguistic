@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
-
+//base abstract class for Unigram and Bigram Model
 public abstract class BaseWordCounter {
-
+	//map with general type, will be initiated separately according to the subclass type
 	protected HashMap map;
+	//total number of words in training data
 	protected int totalWordCount;
+	//resphi is the parameter used in golden section search
 	protected double resphi;
 	
 	public HashMap getHashMap(){
@@ -21,13 +23,14 @@ public abstract class BaseWordCounter {
 		return totalWordCount;
 	}
 	
-
+	//base constructor,initiate the value of member variables 
 	protected BaseWordCounter(){
 		resphi=2-(1+Math.sqrt(5))/2.0;
 		totalWordCount=0;
 		map=generateHashMap();
 	}
 	
+	//parse training data file to map
 	protected void trainModel(String fileName){
 		map.clear();
 		parseFileToMap(fileName,map);
@@ -36,10 +39,13 @@ public abstract class BaseWordCounter {
 	}
 	
 	abstract void setTotalCount();
+	//abstract function to get new HashMap according to the subclass type
 	abstract HashMap generateHashMap();
-	//function to count words in a line
+	
+	//abstract function to count words in a line
 	abstract void splitLineToMap(HashMap hashMap,String line);
 	
+	//parse data from input file to given the give HashMap
 	//function to read input file and save the counts to the map
 	protected void parseFileToMap(String fileName,HashMap hashMap){
 		try {
@@ -58,8 +64,10 @@ public abstract class BaseWordCounter {
 	}
 
 	
+	//abstract function to get |W|
 	abstract int getTypeCount(HashMap hashMap);
 	
+	//recursive golden section search 
 	protected double goldenSectionSearch(HashMap heldOutMap,double a,double b,double c,double tau,int typeCount){
 		assert(c>b&&b>a);
 		double d=0;
@@ -90,28 +98,37 @@ public abstract class BaseWordCounter {
 		
 	} 
 	
+	//abstract function to get the log probability of input HashMap
 	abstract double getLogModelProbFromMap(HashMap hashMap,double para,int typeCount);
 	
+	//get the log probability of input file
 	protected double getLogModelProbFromFile(String fileName,double para){
+		//generate a new HashMap
 		HashMap hashMap=generateHashMap();
+		//parse data to the new HashMap
 		parseFileToMap(fileName,hashMap);
 		return getLogModelProbFromMap(hashMap,para,getTypeCount(hashMap));
 	}
 	
+	//optimize model's parameter using golden section search
+	
 	public double optimizeParameter(String heldOutFile){
+		//parse heldout file to HashMap
 		HashMap heldOutMap=generateHashMap();
 		parseFileToMap(heldOutFile,heldOutMap);
+		//the range of parameter is [0,totalWordCount]
 		double a=1.0,c=totalWordCount;
 		double b=a+resphi*(c-a);
 		return goldenSectionSearch(heldOutMap,a,b,c,0.001/totalWordCount,getTypeCount(heldOutMap));
 	}
-	
+
+	//classify a pair of strings, the one with higher probability is good while the other is bad
+	//return whether the judgment is correct
 	protected boolean classifyGoodBadPair(String[] pair,double para){
 		assert(pair.length==2);
 		double[] probs=new double[2];
 		for(int i=0;i<pair.length;i++){
 			String line=pair[i];
-			//This should be grouped into one function
 			HashMap lineMap=generateHashMap();
 			splitLineToMap(lineMap,line);
 			probs[i]=getLogModelProbFromMap(lineMap,para,getTypeCount(lineMap));
@@ -120,6 +137,7 @@ public abstract class BaseWordCounter {
 		return probs[0]>probs[1];
 	}
 	
+	//given test file, output the correct rate of classifying good & bad pairs
 	public double classifyGoodBadCorrectRate(String testFile,double para){
 		BufferedReader reader;
 		double rate=0.0;
