@@ -1,2 +1,5 @@
 javac langmod/*.java
-java langmod.Langmod unigram/english-senate-0.txt unigram/english-senate-2.txt unigram/english-senate-1.txt unigram/good-bad.txt
+echo 'Unigram Result'
+./unigram english-senate-0.txt english-senate-1.txt english-senate-2.txt good-bad.txt
+echo 'Bigram Result'
+./bigram english-senate-0.txt english-senate-1.txt english-senate-2.txt good-bad.txt

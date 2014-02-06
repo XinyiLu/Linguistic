@@ -27,7 +27,6 @@ goodbad=$4
 # (4) The optimized value of alpha.
 # (5) The optimized value of beta (bigram model only).
 ##############################################################################
-javac langmod/*.java
 java langmod.Bigram $training $testdata $heldout $goodbad
 ##############################################################################
 # Run this script with the command (all on one line)
