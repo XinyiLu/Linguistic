@@ -1,2 +1,2 @@
-javac unigram/*.java
-java unigram.Unigram unigram/english-senate-0.txt unigram/english-senate-2.txt unigram/english-senate-1.txt unigram/good-bad.txt
+javac langmod/*.java
+java langmod.Langmod unigram/english-senate-0.txt unigram/english-senate-2.txt unigram/english-senate-1.txt unigram/good-bad.txt
