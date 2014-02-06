@@ -2,7 +2,7 @@ package langmod;
 
 public class Bigram {
 	public static void main(String[] args){
-		
+		assert(args.length==4);
 		PaddedUnigramModel uniModel=new PaddedUnigramModel();
 		uniModel.trainModel(args[0]);
 		double alpha=uniModel.optimizeParameter(args[2]);

@@ -2,6 +2,7 @@ package langmod;
 
 public class Unigram {
 	public static void main(String[] args){
+		assert(args.length==4);
 		PlainUnigramModel plainUniModel=new PlainUnigramModel();
 		plainUniModel.trainModel(args[0]);
 		
